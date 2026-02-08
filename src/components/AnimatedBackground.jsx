@@ -32,8 +32,19 @@ const AnimatedBackground = () => {
       mousePos.current = { x: e.clientX, y: e.clientY };
     };
 
+    const handleTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        mousePos.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove);
+    
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, []);
 
   useEffect(() => {
@@ -87,7 +98,7 @@ const AnimatedBackground = () => {
   }, [circles.length]);
 
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden cursor-none">
+    <div className="fixed inset-0 bg-black overflow-hidden cursor-none touch-none">
       {/* Render circles */}
       {circles.map((circle, index) => {
         const pos = circlePositions.current[index] || mousePos.current;
@@ -120,9 +131,9 @@ const AnimatedBackground = () => {
         );
       })}
 
-      {/* Mouse glow effect */}
+      {/* Mouse glow effect - hidden on touch devices */}
       <div 
-        className="fixed pointer-events-none transition-none"
+        className="fixed pointer-events-none transition-none hidden md:block"
         style={{
           width: '500px',
           height: '500px',
@@ -133,9 +144,9 @@ const AnimatedBackground = () => {
         }}
       />
 
-      {/* Cursor dot */}
+      {/* Cursor dot - hidden on touch devices */}
       <div 
-        className="fixed pointer-events-none rounded-full transition-none"
+        className="fixed pointer-events-none rounded-full transition-none hidden md:block"
         style={{
           width: '10px',
           height: '10px',
