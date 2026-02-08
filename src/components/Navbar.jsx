@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -12,10 +13,34 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu when screen is resized to desktop
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setMobileMenuOpen(false); // Close menu after clicking
     }
   };
 
@@ -28,66 +53,119 @@ const Navbar = () => {
   ];
 
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
-        ${scrolled
-          ? 'bg-black/80 backdrop-blur-md border-b border-white/10'
-          : 'bg-transparent'
-        }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 py-2">
-        <div className="flex justify-between items-center">
+    <>
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300
+          ${scrolled
+            ? 'bg-black/80 backdrop-blur-md border-b border-white/10'
+            : 'bg-transparent'
+          }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-2">
+          <div className="flex justify-between items-center">
 
-          {/* Developer Logo */}
-          <motion.div
-            onClick={() => scrollToSection('home')}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            whileHover={{ scale: 1.1 }}
-            className="cursor-pointer select-none"
-          >
-            <DeveloperLogo />
-          </motion.div>
-
-          {/* Navigation Links */}
-          <div className="hidden md:flex space-x-6">
-            {navLinks.map((link, index) => (
-              <NavLink
-                key={link.id}
-                name={link.name}
-                onClick={() => scrollToSection(link.id)}
-                delay={0.1 * index}
-              />
-            ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="md:hidden text-white/70 hover:text-white"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            {/* Developer Logo */}
+            <motion.div
+              onClick={() => scrollToSection('home')}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              whileHover={{ scale: 1.1 }}
+              className="cursor-pointer select-none z-50"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </motion.button>
+              <DeveloperLogo />
+            </motion.div>
 
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex space-x-6">
+              {navLinks.map((link, index) => (
+                <NavLink
+                  key={link.id}
+                  name={link.name}
+                  onClick={() => scrollToSection(link.id)}
+                  delay={0.1 * index}
+                />
+              ))}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-white/70 hover:text-white z-50 relative w-8 h-8 flex items-center justify-center"
+              aria-label="Toggle menu"
+            >
+              <div className="w-5 h-4 flex flex-col justify-between">
+                <motion.span
+                  animate={{
+                    rotate: mobileMenuOpen ? 45 : 0,
+                    y: mobileMenuOpen ? 8 : 0,
+                  }}
+                  className="w-full h-0.5 bg-current origin-center"
+                />
+                <motion.span
+                  animate={{
+                    opacity: mobileMenuOpen ? 0 : 1,
+                  }}
+                  className="w-full h-0.5 bg-current"
+                />
+                <motion.span
+                  animate={{
+                    rotate: mobileMenuOpen ? -45 : 0,
+                    y: mobileMenuOpen ? -8 : 0,
+                  }}
+                  className="w-full h-0.5 bg-current origin-center"
+                />
+              </div>
+            </motion.button>
+
+          </div>
         </div>
-      </div>
-    </motion.nav>
+      </motion.nav>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/95 backdrop-blur-lg z-40 md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              className="absolute right-0 top-0 h-full w-3/4 max-w-sm bg-black/90 backdrop-blur-xl border-l border-white/10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col items-start justify-center h-full px-8 space-y-8">
+                {navLinks.map((link, index) => (
+                  <motion.button
+                    key={link.id}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => scrollToSection(link.id)}
+                    className="text-2xl font-light text-white/80 hover:text-white transition-colors duration-300 relative group"
+                  >
+                    {link.name}
+                    <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white group-hover:w-full transition-all duration-300" />
+                  </motion.button>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
