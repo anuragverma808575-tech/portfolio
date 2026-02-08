@@ -227,7 +227,7 @@ const ProjectCard = ({ project, variants }) => {
 
         {/* BACK SIDE */}
         <div
-          className="absolute inset-0 backface-hidden"
+          className="absolute bg-gray-400 inset-0 backface-hidden"
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
         >
           <div className={`w-full h-full  rounded-lg overflow-hidden shadow-2xl p-4 sm:p-5 flex flex-col justify-between`}>
