@@ -230,7 +230,7 @@ const ProjectCard = ({ project, variants }) => {
           className="absolute inset-0 backface-hidden"
           style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
         >
-          <div className={`w-full h-full bg-gradient-to-br ${project.gradient} rounded-lg overflow-hidden shadow-2xl p-4 sm:p-5 flex flex-col justify-between`}>
+          <div className={`w-full h-full  rounded-lg overflow-hidden shadow-2xl p-4 sm:p-5 flex flex-col justify-between`}>
             {/* Back Content */}
             <div>
               <motion.h3 
