@@ -158,7 +158,7 @@ const ProjectCard = ({ project, variants }) => {
           <div className="w-full h-full bg-black border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-all duration-300 shadow-xl">
             {/* Project Image */}
             <div className="relative h-36 sm:h-44 overflow-hidden">
-              <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-60`} />
+              <div className={`absolute inset-0 opacity-60`} />
               <motion.img
                 src={project.image}
                 alt={project.title}
