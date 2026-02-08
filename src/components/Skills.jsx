@@ -17,17 +17,26 @@ const Skills = () => {
 
   const handleClick = () => setExpanded(!expanded);
 
-  /* 🔥 NON-OVERLAPPING POSITIONS */
+  /* 🔥 RESPONSIVE NON-OVERLAPPING POSITIONS */
   const scatteredPositions = useMemo(() => {
     const positions = [];
     const itemsPerRing = 6;
-    const baseRadius = 180;
-    const gap = 140;
+    
+    // Responsive base radius
+    const getBaseRadius = () => {
+      if (typeof window === 'undefined') return 180;
+      if (window.innerWidth < 640) return 80; // mobile
+      if (window.innerWidth < 768) return 120; // tablet
+      if (window.innerWidth < 1024) return 150; // small desktop
+      return 180; // large desktop
+    };
+
+    const baseRadius = getBaseRadius();
+    const gap = baseRadius * 0.75;
 
     skills.forEach((_, index) => {
       const ring = Math.floor(index / itemsPerRing);
-      const angle =
-        ((index % itemsPerRing) / itemsPerRing) * Math.PI * 2;
+      const angle = ((index % itemsPerRing) / itemsPerRing) * Math.PI * 2;
       const radius = baseRadius + ring * gap;
 
       positions.push({
@@ -43,9 +52,9 @@ const Skills = () => {
   return (
     <section
       id="skills"
-      className="relative flex flex-col items-center justify-center min-h-screen py-32"
+      className="relative flex flex-col items-center justify-center min-h-screen py-20 sm:py-32 px-4"
     >
-      <h2 className="text-4xl md:text-5xl font-light text-white mb-16">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-light text-white mb-12 sm:mb-16 text-center px-4">
         Skills & Technologies
       </h2>
 
@@ -54,15 +63,26 @@ const Skills = () => {
         onClick={handleClick}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
-        className="mb-12 px-6 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition"
+        className="mb-8 sm:mb-12 px-5 sm:px-6 py-2 sm:py-2.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition text-sm sm:text-base"
       >
         {expanded ? "Reset Skills" : "Show Skills"}
       </motion.button>
 
-      <div className="relative w-[700px] h-[700px] flex items-center justify-center">
+      {/* Responsive container */}
+      <div className="relative w-full max-w-[350px] h-[350px] sm:max-w-[500px] sm:h-[500px] md:max-w-[600px] md:h-[600px] lg:max-w-[700px] lg:h-[700px] flex items-center justify-center">
         {skills.map((skill, index) => {
           const angle = (index / skills.length) * Math.PI * 2;
-          const circleRadius = 180;
+          
+          // Responsive circle radius
+          const getCircleRadius = () => {
+            if (typeof window === 'undefined') return 180;
+            if (window.innerWidth < 640) return 80;
+            if (window.innerWidth < 768) return 120;
+            if (window.innerWidth < 1024) return 150;
+            return 180;
+          };
+          
+          const circleRadius = getCircleRadius();
 
           const initialX = Math.cos(angle) * circleRadius;
           const initialY = Math.sin(angle) * circleRadius;
@@ -74,7 +94,7 @@ const Skills = () => {
           return (
             <motion.div
               key={index}
-              className="absolute w-28 h-28 rounded-lg bg-white/10 border border-white/20 
+              className="absolute w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-lg bg-white/10 border border-white/20 
                          flex flex-col items-center justify-center text-center
                          shadow-lg backdrop-blur-md"
               initial={{ scale: 0, opacity: 0 }}
@@ -96,12 +116,12 @@ const Skills = () => {
                 boxShadow: "0 20px 40px rgba(255,255,255,0.25)",
               }}
             >
-              <span className="text-white font-medium">
+              <span className="text-white font-medium text-xs sm:text-sm md:text-base px-2">
                 {skill.name}
               </span>
 
               {expanded && (
-                <span className="text-white/60 text-sm mt-1">
+                <span className="text-white/60 text-xs sm:text-sm mt-1">
                   {skill.level}%
                 </span>
               )}
@@ -124,7 +144,7 @@ const Skills = () => {
       </div>
 
       {!expanded && (
-        <p className="text-white/50 mt-6 text-sm">
+        <p className="text-white/50 mt-4 sm:mt-6 text-xs sm:text-sm text-center px-4">
           Click the button to reveal skills
         </p>
       )}
